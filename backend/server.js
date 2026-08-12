@@ -1,20 +1,10 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
-
 const app = express();
+const connectDB = require("./config/db.js");
 
-main()
-.then(() => {
-    console.log("MongoDB connected");
-})
-.catch((err) => {
-    console.error("MongoDB connection failde:", error);
-});
 
-async function main() {
-  await mongoose.connect(process.env.MONGODB_URI);
-}
+
 
 app.get("/",(req,res) => {
     res.send("URL SHORTENER API is running");
@@ -22,6 +12,12 @@ app.get("/",(req,res) => {
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, ()=>{
-    console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+    await connectDB();
+
+    app.listen(PORT, ()=>{
+       console.log(`Server running on port ${PORT}`);
+    });
+};
+startServer();
+
