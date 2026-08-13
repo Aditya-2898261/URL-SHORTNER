@@ -6,6 +6,18 @@ import {
 
 export const createShortUrl = async (req,res) => {
     const { originalUrl } = req.body;
+    if(!originalUrl){
+        return res.status(400).json({
+            message:"originalUrl is required"
+        });
+    }
+    try{
+        new URL(originalUrl);
+    }catch{
+        return res.status(400).json({
+            message: "Invalid URL"
+        });
+    }
     const result = await createShortUrlService(originalUrl);
     res.json(result);
 };

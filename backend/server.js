@@ -4,6 +4,8 @@ import connectDB from "./config/db.js";
 import urlRoutes from "./routes/urlRoutes.js";
 import redirectRoutes from "./routes/redirectRoutes.js";
 
+import { errorHandler } from "./middleware/errorHandler.js";
+
 
 dotenv.config();
 const app = express();
@@ -16,6 +18,8 @@ app.use("/",redirectRoutes);
 app.get("/",(req,res) => {
     res.send("URL SHORTENER API is running");
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 
