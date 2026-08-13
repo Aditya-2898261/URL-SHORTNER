@@ -1,10 +1,17 @@
-require("dotenv").config();
-const express = require("express");
+import dotenv from "dotenv";
+import express from "express";
+import connectDB from "./config/db.js";
+import urlRoutes from "./routes/urlRoutes.js";
+import redirectRoutes from "./routes/redirectRoutes.js";
+
+
+dotenv.config();
 const app = express();
-const connectDB = require("./config/db.js");
 
+app.use(express.json());
 
-
+app.use("/api/urls",urlRoutes);
+app.use("/",redirectRoutes);
 
 app.get("/",(req,res) => {
     res.send("URL SHORTENER API is running");
