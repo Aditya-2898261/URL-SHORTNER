@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
+import cors from "cors";
 import urlRoutes from "./routes/urlRoutes.js";
 import redirectRoutes from "./routes/redirectRoutes.js";
 
@@ -10,6 +11,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 dotenv.config();
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/urls",urlRoutes);
