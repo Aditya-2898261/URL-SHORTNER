@@ -1,6 +1,6 @@
 import express from "express";
 import { redirectUrl } from "../controllers/urlController.js";
-import { wrapAsync } from "../middleware/wrapAsync.js";
+import { wrapAsync } from "../utils/wrapAsync.js";
 
 const router = express.Router();
 
