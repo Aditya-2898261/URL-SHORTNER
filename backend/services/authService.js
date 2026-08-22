@@ -8,6 +8,7 @@ export const registerUserService = async(name,email,password) => {
     error.statusCode = 400;
     throw error;
     }
+    email = email.trim().toLowerCase();
   const existingUser = await User.findOne({email});
   if(existingUser){
     const error = new Error("User already exists");
@@ -29,7 +30,7 @@ export const loginUserService = async(email,password) => {
     error.statusCode = 400;
     throw error;
     }
-
+    email = email.trim().toLowerCase();
     const loggedInUser = await User.findOne({email});
     if(!loggedInUser){
         const error = new Error("Invalid email or password");
@@ -42,17 +43,12 @@ export const loginUserService = async(email,password) => {
         error.statusCode = 401;
         throw error;
     }
-    const token = await jwt.sign(
+    const token = jwt.sign(
         {userId:loggedInUser._id},
         process.env.JWT_SECRET,
         {expiresIn:'1h'}
     );
     return {
-     token,
-     user: {
-        id: loggedInUser._id,
-        name: loggedInUser.name,
-        email: loggedInUser.email,
-     },
+     token
     };
 }

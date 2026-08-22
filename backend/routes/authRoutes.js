@@ -7,6 +7,5 @@ const router = express.Router();
 
 router.post("/register", wrapAsync(registerUser));
 router.post("/login",wrapAsync(loginUser));
-router.get("/test", isLoggedIn, testAuth);
 
 export default router;

@@ -9,7 +9,7 @@ export const isLoggedIn = (req,res,next) => {
     try{
     const decoded =  jwt.verify(token,process.env.JWT_SECRET);
      req.user = decoded.userId;
-     next();
+     return next();
     }catch(error){
       error.statusCode = 401;
       next(error);

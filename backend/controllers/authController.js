@@ -17,7 +17,7 @@ export const registerUser = async(req,res) => {
 
 export const loginUser = async(req,res) => {
     const {email,password} = req.body;
-    const {token,user} = await loginUserService(email,password);
+    const {token} = await loginUserService(email,password);
     res.cookie("token",token,
         {
             httpOnly:true,
@@ -26,13 +26,8 @@ export const loginUser = async(req,res) => {
         }
     );
     res.status(200).json({
-        message:"Login Successfull"
+        message:"Login Successful"
     });
 }
 
-export const testAuth = (req, res) => {
-    res.status(200).json({
-        message: "You are authenticated",
-        userId: req.user,
-    });
-};
+
