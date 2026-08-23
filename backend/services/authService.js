@@ -3,11 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const registerUserService = async(name,email,password) => {
-    if (!name || !email || !password) {
-    const error = new Error("Name, email and password are required");
-    error.statusCode = 400;
-    throw error;
-    }
     email = email.trim().toLowerCase();
   const existingUser = await User.findOne({email});
   if(existingUser){
@@ -25,11 +20,6 @@ export const registerUserService = async(name,email,password) => {
 }
 
 export const loginUserService = async(email,password) => {
-     if (!email || !password) {
-    const error = new Error("Email and password are required");
-    error.statusCode = 400;
-    throw error;
-    }
     email = email.trim().toLowerCase();
     const loggedInUser = await User.findOne({email});
     if(!loggedInUser){

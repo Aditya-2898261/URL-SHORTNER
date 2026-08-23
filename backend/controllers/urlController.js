@@ -8,18 +8,7 @@ import {
 
 export const createShortUrl = async (req,res) => {
     const { originalUrl } = req.body;
-    if(!originalUrl){
-        return res.status(400).json({
-            message:"originalUrl is required"
-        });
-    }
-    try{
-        new URL(originalUrl);
-    }catch{
-        return res.status(400).json({
-            message: "Invalid URL"
-        });
-    }
+    
     const result = await createShortUrlService(originalUrl, req.user);
     res.json(result);
 };
@@ -37,7 +26,7 @@ export const redirectUrl = async(req,res) => {
 
 export const showMyUrls = async(req,res) => {
     const myUrls = await showMyUrlsService(req.user);
-    if(myUrls.length == 0){
+    if(myUrls.length === 0){
       return res.json({
         message:"create one to have your urls"
       })

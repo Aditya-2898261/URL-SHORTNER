@@ -1,11 +1,12 @@
 import express from "express";
-import {registerUser,loginUser,testAuth} from "../controllers/authController.js";
+import {registerUser,loginUser} from "../controllers/authController.js";
 import { wrapAsync } from "../utils/wrapAsync.js";
-import { isLoggedIn } from "../middleware/authMiddleware.js";
+import { validate } from "../middleware/validate.js";
+import { registerSchema, loginSchema } from "../validators/authValidator.js";
 
 const router = express.Router();
 
-router.post("/register", wrapAsync(registerUser));
-router.post("/login",wrapAsync(loginUser));
+router.post("/register", validate(registerSchema), wrapAsync(registerUser));
+router.post("/login", validate(loginSchema), wrapAsync(loginUser));
 
 export default router;
