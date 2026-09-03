@@ -18,7 +18,9 @@ export const redirectUrl = async(shortCode) => {
     if(!urlDoc){
         return null;
     }
+    
     const originalUrl = urlDoc.originalUrl;
+    console.log(originalUrl);
     return originalUrl;
 }
 

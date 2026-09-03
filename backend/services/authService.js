@@ -38,7 +38,19 @@ export const loginUserService = async(email,password) => {
         process.env.JWT_SECRET,
         {expiresIn:'1h'}
     );
+    const user = {
+      id: loggedInUser._id,
+      name: loggedInUser.name,
+      email: loggedInUser.email
+    }
     return {
-     token
+     token,
+     user
     };
-}
+};
+
+export const getCurrentUserService = async(userId) => {
+  const user = await User.findById(userId).select("-password");
+  return user;
+};
+

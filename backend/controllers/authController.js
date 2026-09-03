@@ -1,4 +1,8 @@
-import {registerUserService,loginUserService} from "../services/authService.js";
+import {
+    registerUserService,
+    loginUserService,
+    getCurrentUserService
+} from "../services/authService.js";
 
 export const registerUser = async(req,res) => {
     const {name, email, password} = req.body;
@@ -17,7 +21,7 @@ export const registerUser = async(req,res) => {
 
 export const loginUser = async(req,res) => {
     const {email,password} = req.body;
-    const {token} = await loginUserService(email,password);
+    const {token, user} = await loginUserService(email,password);
     res.cookie("token",token,
         {
             httpOnly:true,
@@ -26,8 +30,27 @@ export const loginUser = async(req,res) => {
         }
     );
     res.status(200).json({
-        message:"Login Successful"
+        message:"Login Successful",
+        user
     });
-}
+};
+
+export const getCurrentUser = async(req,res) => {
+    const user = await getCurrentUserService(req.user);
+    res.status(200).json({
+        user
+    });
+};
+
+export const logoutUser = async (req,res) => {
+    res.clearCookie("token",{
+        httpOnly:true,
+        secure:false,
+        sameSite:"strict",
+    });
+    res.status(200).json({
+        message: "Logout Successful",
+    });
+};
 
 
