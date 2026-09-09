@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import Url from "../models/url.js";
+import { redisClient } from "../config/redis.js";
 
 export const createShortUrl = async (originalUrl, userId) => {
   const shortCode = nanoid();
@@ -14,12 +15,41 @@ export const createShortUrl = async (originalUrl, userId) => {
 };
 
 export const redirectUrl = async(shortCode) => {
+
+   let cacheUrl = null;
+
+   if(redisClient.isOpen){
+    try{
+      cacheUrl = await redisClient.get(`url:${shortCode}`);
+    }catch(error){
+      console.error("Redis GET failed:", error.message);
+    }
+   }
+   
+    if(cacheUrl){
+      console.log("Cache HIT");
+      return cacheUrl;
+    }
+
+    console.log("Cache MISS");
+
     const urlDoc = await Url.findOne({ shortCode });
     if(!urlDoc){
         return null;
     }
     
     const originalUrl = urlDoc.originalUrl;
+
+    if(redisClient.isOpen){
+      try{
+        await redisClient.set(`url:${shortCode}`, originalUrl,{
+       EX: 60,
+        }); 
+      }catch(error){
+        console.error("Redis SET failed:", error.message);
+      }
+    }
+
     console.log(originalUrl);
     return originalUrl;
 }
@@ -44,5 +74,14 @@ export const deleteUrl = async(urlId, userId) => {
   }
 
   const deletedUrl = await Url.findByIdAndDelete(urlId);
+
+  if(redisClient.isOpen){
+    try{
+      await redisClient.del(`url:${deletedUrl.shortCode}`);
+    }catch(error){
+      console.error("Redis DEL failed:",error.message);
+    }
+  }
+
   return deletedUrl;
 } 

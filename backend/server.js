@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
+import { connectRedis } from "./config/redis.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import urlRoutes from "./routes/urlRoutes.js";
@@ -37,9 +38,18 @@ const PORT = process.env.PORT;
 const startServer = async () => {
     await connectDB();
 
+    try{
+      await connectRedis();
+    }catch(error){
+      console.error("Redis unavailable. Starting without Redis.");
+    }
+
     app.listen(PORT, ()=>{
        console.log(`Server running on port ${PORT}`);
     });
 };
 startServer();
+
+
+
 
