@@ -4,17 +4,21 @@ function Home() {
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     setError("");
     setShortUrl("");
+    
 
     if (!url.trim()) {
       setError("Please enter a URL.");
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -34,9 +38,15 @@ function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError("Please enter a valid URL.");
-        console.error(data);
-        return;
+         if (response.status === 429) {
+            const retryAfter = data.retryAfter;
+            setError(
+              `Too many requests. Please try again in ${retryAfter} seconds.`
+            );
+          } else {
+             setError(data.message || "Something went wrong.");
+          }
+          return;
       }
 
       setShortUrl(
@@ -45,6 +55,8 @@ function Home() {
     } catch (error) {
       console.error("Error creating short URL:", error);
       setError("Something went wrong. Please try again.");
+    } finally{
+      setIsSubmitting(false);
     }
   };
 
@@ -60,8 +72,8 @@ function Home() {
           onChange={(event) => setUrl(event.target.value)}
         />
 
-        <button type="submit">
-          Shorten
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Shortening..." : "Shorten"}
         </button>
       </form>
 

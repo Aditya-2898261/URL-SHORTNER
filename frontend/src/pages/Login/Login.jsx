@@ -32,11 +32,18 @@ function Login() {
                 }),
             });
             console.log("Login response:", response.status);
+
             const data = await response.json();
             if(!response.ok){
-                setError(data.message);
+                if(response.status === 429){
+                    const retryAfter = data.retryAfter;
+                    setError(`Too many login attempts. Please try again in ${retryAfter} seconds.`);
+                }else{
+                    setError(data.message);
+                }
                 return;
             }
+
             setUser(data.user);
             navigate("/home");
        } catch (error) {
@@ -65,7 +72,7 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="sumbit">
+        <button type="sumbit" disabled={isSubmitting}>
             {isSubmitting ? "Logging in..." : "Login"}
         </button>
         {error && <p>{error}</p>}

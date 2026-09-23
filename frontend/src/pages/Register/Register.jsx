@@ -31,10 +31,17 @@ function Register() {
              }
             );
 
-            const data = await response.json();
-            if(!response.ok){
+           const data = await response.json();
+           if (!response.ok) {
+              if (response.status === 429) {
+                const retryAfter = data.retryAfter;
+                setError(
+                    `Too many registration attempts. Please try again in ${retryAfter} seconds.`
+                );
+              } else {
                 setError(data.message);
-                return;
+              }
+              return;
             }
             navigate("/login");
         }catch{

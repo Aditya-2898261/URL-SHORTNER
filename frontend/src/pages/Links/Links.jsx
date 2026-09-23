@@ -22,9 +22,15 @@ function Links() {
         const data = await response.json();
 
         if (!response.ok) {
-          console.log(response);
-          setError("Something went wrong.");
-          return;
+            if (response.status === 429) {
+               const retryAfter = data.retryAfter;
+               setError(
+               `Too many requests. Please try again in ${retryAfter} seconds.`
+                );
+            } else {
+              setError(data.message || "Something went wrong.");
+            }
+            return;
         }
 
         if (!data.data) {
@@ -58,8 +64,16 @@ function Links() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Failed to delete URL.");
-        return;
+          if (response.status === 429) {
+            const retryAfter = data.retryAfter;
+
+            setError(
+              `Too many delete requests. Please try again in ${retryAfter} seconds.`
+            );
+          } else {
+            setError(data.message || "Failed to delete URL.");
+          }
+          return;
       }
 
       setUrls((currentUrls) =>
@@ -68,6 +82,8 @@ function Links() {
     } catch (error) {
       console.error("Error deleting URL:", error);
       setError("Something went wrong.");
+    } finally{
+      setDeletingId(null);
     }
   };
 
