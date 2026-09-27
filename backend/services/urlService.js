@@ -3,15 +3,32 @@ import Url from "../models/url.js";
 import { redisClient } from "../config/redis.js";
 
 export const createShortUrl = async (originalUrl, userId) => {
-  const shortCode = nanoid();
-  const urlDoc = new Url({
-    originalUrl,
-    shortCode,
-    user: userId,
-  });
+  const MAX_ATTEMPTS = 3;
+  for(let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++){
 
-  const savedUrl = await urlDoc.save();
-  return savedUrl;
+    const shortCode = nanoid(7);
+    const urlDoc = new Url({
+      originalUrl,
+      shortCode,
+      user: userId,
+    });
+
+    try{
+      const savedUrl = await urlDoc.save();
+      return savedUrl;
+    }catch(error){
+      if(error.code === 11000 && error.keyPattern?.shortCode){
+        if(attempt === MAX_ATTEMPTS){
+          const collisionError = new Error("Unable to generate a unique short code");
+          collisionError.statusCode = 500;
+          throw collisionError;
+        }
+        continue;
+      }
+      throw error;
+    }
+
+  }
 };
 
 export const redirectUrl = async(shortCode) => {
