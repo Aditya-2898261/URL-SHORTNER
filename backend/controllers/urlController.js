@@ -1,9 +1,11 @@
+import clickAnalyticsQueue from "../queues/clickAnalyticsQueue.js";
 import {
     createShortUrl as createShortUrlService,
     redirectUrl as redirectUrlService,
     showMyUrls as showMyUrlsService,
     deleteUrl as deleteUrlService
 } from "../services/urlService.js";
+import crypto from "crypto";
 
 
 export const createShortUrl = async (req,res) => {
@@ -21,6 +23,28 @@ export const redirectUrl = async(req,res) => {
             message: "Short URL not found"
         });
     }
+
+    const clickEvent = {
+    eventId: crypto.randomUUID(),
+    shortCode: req.params.shortCode,
+    timestamp: new Date(),
+    ip: req.ip,
+    userAgent: req.headers["user-agent"],
+    referrer: req.get("referer"),
+    query: req.query
+    };
+
+    try{
+        const job = await clickAnalyticsQueue.add("click",clickEvent);
+         console.log("Click analytics job added");
+         console.log("Job ID:", job.id);
+    }catch(error){
+        console.error(
+            "Failed to queue click analytics:",
+            error.message
+        );
+    }
+
     res.redirect(originalUrl);
 };
 
